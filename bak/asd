@@ -1,0 +1,26 @@
+def detect_circles_with_yolov8(frame, yolo_model, focal_length_pixels, actual_radius_mm):
+    results_list = yolo_model.predict(source=frame, show=False)
+    results = results_list[0]
+    circles = []
+    for detection in results.boxes:
+        x_min, y_min, x_max, y_max, conf, _ = detection.data[0].tolist()  # Kutu koordinatlarını al
+        label = results.names[int(detection.cls[0])]  # Sınıf etiketini al
+
+        # Yalnızca 'cember' etiketine sahip nesneleri işle
+        if label == 'daire':
+            # Merkez koordinatları ve yarıçapı hesapla
+            x_center = int((x_min + x_max) / 2)
+            y_center = int((y_min + y_max) / 2)
+            radius = int((x_max - x_min) / 2)
+            area = int(math.pi * radius * radius)
+            # Dairenin kameradan olan uzaklığını tahmin et
+            distance_to_circle = estimate_distance_to_circle(radius, focal_length_pixels, actual_radius_mm)
+
+            print(f"Circle Center: ({x_center}, {y_center}), Radius: {radius}, Confidence: {conf},"
+                  f" Label: {label}, Distance: {distance_to_circle} mm , Area: {area}")
+            circles.append((x_center, y_center, radius, distance_to_circle))
+
+            if(x_center > 100 and x_center < 200):
+                if(y_center>100 and y_center<180):
+                    frame = cv2.putText(frame, "Torpido At", (250,240), cv2.FONT_HERSHEY_SIMPLEX,0.5, (200,200,200), 2)
+    return circles

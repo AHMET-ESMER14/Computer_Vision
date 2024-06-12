@@ -1,0 +1,9 @@
+def estimate_distance_to_circle(radius_in_pixels, focal_length_in_pixels, actual_radius_in_mm):
+
+    # Dairenin gerçek çapını ve piksel çapını karşılaştırarak bir ölçek faktörü bulunur.
+    scale_factor = actual_radius_in_mm / (2 * radius_in_pixels)
+
+    # Kameradan daireye olan mesafeyi tahmin etmek için ölçek faktörü kullanılır.
+    distance_mm = focal_length_in_pixels * scale_factor
+
+    return distance_mm
